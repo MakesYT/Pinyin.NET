@@ -15,21 +15,25 @@ class Program
     static void Main(string[] args)
     {
         var list = new List<MyClass>();
-        PinyinProcessor pinyinProcessor = new PinyinProcessor();
+        PinyinProcessor pinyinProcessor = new PinyinProcessor(PinyinFormat.WithToneMark);
         list.Add(new MyClass
         {
             Name = "1.1.2.5内测版5.0",
             Pinyin = pinyinProcessor.GetPinyin("1.1.2.5内测版5.0")});
+        var enumerable = pinyinProcessor.GetPinyin("尝试111到底是");
         list.Add(new MyClass
         {
             Name = "尝试111到底是",
-            Pinyin = pinyinProcessor.GetPinyin("尝试111到底是")});
+            Pinyin = enumerable});
+
+        Console.WriteLine(enumerable);
+        
          list.Add(new MyClass
         {
             Name = "但是等待",
             Pinyin = pinyinProcessor.GetPinyin("但是等待")});
         PinyinSearcher pinyinSearcher = new PinyinSearcher(list, "Pinyin");
-        var search = pinyinSearcher.Search("ddi");
+        var search = pinyinSearcher.Search("dansden");
         foreach (var searchResult in search)
         {
             Console.WriteLine($" {searchResult.Weight}  {((MyClass)searchResult.Source).Name}");
