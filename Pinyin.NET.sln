@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinyin.NET", "Pinyin.NET\Pinyin.NET.csproj", "{C12DCAD6-011D-4D2D-AB86-C81BD6A2C116}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinyin.NET.Test", "Pinyin.NET.Test\Pinyin.NET.Test.csproj", "{008549C5-5E89-4503-8C4C-9A92C4CDD581}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C12DCAD6-011D-4D2D-AB86-C81BD6A2C116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C12DCAD6-011D-4D2D-AB86-C81BD6A2C116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C12DCAD6-011D-4D2D-AB86-C81BD6A2C116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C12DCAD6-011D-4D2D-AB86-C81BD6A2C116}.Release|Any CPU.Build.0 = Release|Any CPU
+		{008549C5-5E89-4503-8C4C-9A92C4CDD581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{008549C5-5E89-4503-8C4C-9A92C4CDD581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{008549C5-5E89-4503-8C4C-9A92C4CDD581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{008549C5-5E89-4503-8C4C-9A92C4CDD581}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

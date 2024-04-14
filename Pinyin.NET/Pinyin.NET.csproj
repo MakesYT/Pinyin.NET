@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="char_base_a.json" />
+      <EmbeddedResource Include="char_base_a.json" />
+      <None Remove="char_common_base_a.json" />
+      <EmbeddedResource Include="char_common_base_a.json" />
+    </ItemGroup>
+
+</Project>
