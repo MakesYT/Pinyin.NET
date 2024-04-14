@@ -72,7 +72,11 @@ public class PinyinSearcher
                                     match = true;
                                     matches[j] = true;
                                     weight++;
-                                    matchIndexList.Add(j);
+                                    if (!matchIndexList.Contains(j)&&j>i1)
+                                    {
+                                        matchIndexList.Add(j);
+                                    }
+                                    
                                 
                                 }
                             }
