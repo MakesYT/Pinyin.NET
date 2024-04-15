@@ -15,19 +15,17 @@ class Program
     static void Main(string[] args)
     {
         var list = new List<MyClass>();
-        PinyinProcessor pinyinProcessor = new PinyinProcessor(PinyinFormat.WithToneMark);
-        list.Add(new MyClass
-        {
-            Name = "1.1.2.5内测版5.0",
-            Pinyin = pinyinProcessor.GetPinyin("1.1.2.5内测版5.0")});
-        var enumerable = pinyinProcessor.GetPinyin("尝试111到底是");
-        list.Add(new MyClass
-        {
-            Name = "尝试111到底是",
-            Pinyin = enumerable});
-
-        Console.WriteLine(enumerable);
-        
+        PinyinProcessor pinyinProcessor = new PinyinProcessor();
+        // list.Add(new MyClass
+        // {
+        //     Name = "1.1.2.5内测版5.0",
+        //     Pinyin = pinyinProcessor.GetPinyin("1.1.2.5内测版5.0")});
+        // var enumerable = pinyinProcessor.GetPinyin("尝试111到底是");
+        // list.Add(new MyClass
+        // {
+        //     Name = "尝试111到底是",
+        //     Pinyin = enumerable});
+        //
          list.Add(new MyClass
         {
             Name = "但是等待",

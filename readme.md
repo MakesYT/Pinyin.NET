@@ -15,6 +15,7 @@ pinyinProcessor.GetPinyin("到底");//[["dao"], ["di","de"]]
 
 ## 2. 拼音模糊搜索
 在给的的数据源中的指定属性上进行拼音模糊搜索
+支持拼音全拼 首字母 全拼和首字母混合搜索 (支持多音字)
 ```csharp
 PinyinProcessor pinyinProcessor = new PinyinProcessor(PinyinFormat.WithToneMark);
 var enumerable = pinyinProcessor.GetPinyin("尝试111到底是");

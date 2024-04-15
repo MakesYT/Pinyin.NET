@@ -66,9 +66,11 @@ public class PinyinSearcher
                                         }
                                         else
                                         {
+                                            //Console.WriteLine("     "+sb+" "+se+"匹配成功");
                                             i++;
                                         }
                                     }
+                                    //Console.WriteLine("     L "+sb+" "+se+"匹配成功");
                                     match = true;
                                     matches[j] = true;
                                     weight++;
