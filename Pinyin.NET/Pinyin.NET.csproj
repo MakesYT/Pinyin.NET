@@ -4,6 +4,14 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Copyright>MakesYT</Copyright>
+        <PackageProjectUrl>https://github.com/MakesYT/Pinyin.NET</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/MakesYT/Pinyin.NET/blob/master/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/MakesYT/Pinyin.NET</RepositoryUrl>
+        <RepositoryType>public</RepositoryType>
+        <PackageTags>拼音 汉字 搜索</PackageTags>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
     <ItemGroup>
