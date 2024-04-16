@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Pinyin.NET;
 
@@ -55,24 +56,44 @@ public class PinyinProcessor
             
         }
     }
+    Regex regex = new("[\u4e00-\u9fa5]");
     public IEnumerable<IEnumerable<string>> GetPinyin(string text)
     {
         var result = new List<List<string>>();
+        StringBuilder sb = new();
         for (var i = 0; i < text.Length; i++)
         {
-            var c = text[i].ToString();
-            if (_pinyinDict.ContainsKey(c))
+            var input = text[i].ToString();
+            if (regex.IsMatch(input))
             {
-                result.Add([.._pinyinDict[c]]);
-            }
-            else if (_pinyinFullDict.ContainsKey(c))
-            {
-                result.Add([.._pinyinFullDict[c]]);
+                if (sb.Length > 0)
+                {
+                    
+                    result.Add([sb.ToString().ToLower()]);
+                    sb.Clear();
+                }
+                var c = input;
+                if (_pinyinDict.ContainsKey(c))
+                {
+                    result.Add([.._pinyinDict[c]]);
+                }
+                else if (_pinyinFullDict.ContainsKey(c))
+                {
+                    result.Add([.._pinyinFullDict[c]]);
+                }
+                else
+                {
+                    result.Add([c]);
+                }
             }
             else
             {
-                result.Add([c]);
+                sb.Append(input);
             }
+        }
+        if (sb.Length > 0)
+        {
+            result.Add([sb.ToString().ToLower()]);
         }
         return result;
     }
