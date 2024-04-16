@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -12,13 +12,22 @@
         <RepositoryType>public</RepositoryType>
         <PackageTags>拼音 汉字 搜索</PackageTags>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageId>PinyinM.NET</PackageId>
+        <Authors>MakesYT</Authors>
+        <PackageReadmeFile>readme.md</PackageReadmeFile>
+        <LangVersion>12</LangVersion>
+        <Description>汉字转换为拼音 拼音模糊搜索</Description>
     </PropertyGroup>
-
+    <ItemGroup>
+        <Resource Include="..\readme.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
     <ItemGroup>
       <None Remove="char_base_a.json" />
       <EmbeddedResource Include="char_base_a.json" />
       <None Remove="char_common_base_a.json" />
       <EmbeddedResource Include="char_common_base_a.json" />
     </ItemGroup>
+
+    
 
 </Project>
