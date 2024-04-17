@@ -56,7 +56,20 @@ public class PinyinProcessor
             
         }
     }
-    Regex regex = new("[\u4e00-\u9fa5]");
+    //中文匹配正则
+    readonly Regex regex = new("[\u4e00-\u9fa5]");
+    //大写字母数组char
+    readonly char[] _charArray =
+    [
+
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+        'V', 'W', 'X', 'Y', 'Z'
+    ];
+    readonly char[] _charArraySplit =
+    [
+        ' ', '_', '-', '.', ',', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '[', ']', '{', '}', 
+        '\\', '|', ';', ':', '"', '\'', '<', '>', '?', '/', '~'
+    ];
     public IEnumerable<IEnumerable<string>> GetPinyin(string text)
     {
         var result = new List<List<string>>();
@@ -88,6 +101,22 @@ public class PinyinProcessor
             }
             else
             {
+                if (_charArray.Contains(text[i]))
+                {
+                    if (sb.Length > 0)
+                    {
+                        result.Add([sb.ToString().ToLower()]);
+                        sb.Clear();
+                    }
+                }else if (_charArraySplit.Contains(text[i]))
+                {
+                    if (sb.Length > 0)
+                    {
+                        result.Add([sb.ToString().ToLower()]);
+                        sb.Clear();
+                    }
+                    continue;
+                }
                 sb.Append(input);
             }
         }

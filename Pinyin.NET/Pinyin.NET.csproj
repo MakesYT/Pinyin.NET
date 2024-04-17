@@ -17,11 +17,8 @@
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <LangVersion>12</LangVersion>
         <Description>汉字转换为拼音 拼音模糊搜索</Description>
-        <Version>1.0.1</Version>
-        <PackageReleaseNotes>优化 包含英文的字母的拼音转换
-            新增 泛型搜索类型
-            优化 添加对字典以及KeyValuePair支持
-            优化 权重计算</PackageReleaseNotes>
+        <Version>1.0.2</Version>
+        <PackageReleaseNotes>优化 混合字符转拼音,现在会自动以大写字母和部分分隔符分割</PackageReleaseNotes>
     </PropertyGroup>
     <ItemGroup>
         <Resource Include="..\readme.md" Pack="true" PackagePath="\"/>
