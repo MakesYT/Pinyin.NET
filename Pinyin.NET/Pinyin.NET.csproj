@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -19,6 +18,7 @@
         <Description>汉字转换为拼音 拼音模糊搜索</Description>
         <Version>1.0.2</Version>
         <PackageReleaseNotes>优化 混合字符转拼音,现在会自动以大写字母和部分分隔符分割</PackageReleaseNotes>
+        <TargetFrameworks>net6.0;netcoreapp3.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
         <Resource Include="..\readme.md" Pack="true" PackagePath="\"/>
