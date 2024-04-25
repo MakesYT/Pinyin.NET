@@ -124,24 +124,28 @@ public class PinyinSearcher<T>
     public IEnumerable Source { get; set; }
     private bool isKeyValuePair;
     public string PropertyName { get; set; }
-    public PinyinSearcher(IEnumerable source, string propertyName,bool isKeyValuePair=false)
+    private string? CharMatchResultsPropertyName { get; set; }
+    public PinyinSearcher(IEnumerable source, string propertyName,string? charMatchResultsPropertyName=null,bool isKeyValuePair=false)
     {
         Source = source;
         PropertyName = propertyName;
         this.isKeyValuePair = isKeyValuePair;
-        
-        
+        CharMatchResultsPropertyName = charMatchResultsPropertyName;
+
     }
    
-    public PinyinSearcher(Dictionary<object,T> source, string propertyName)
+    public PinyinSearcher(Dictionary<object,T> source, string propertyName,string? charMatchResultsPropertyName=null)
     {
         SourceDictionary = source;
         PropertyName = propertyName;
+        CharMatchResultsPropertyName = charMatchResultsPropertyName;
+    }
+
+
+    private void PreSearch()
+    {
         
     }
-    
-   
-    
     private void Search(string query,List<SearchResults<T>> results,T source)
     {
         var value = source.GetType()
@@ -159,27 +163,28 @@ public class PinyinSearcher<T>
             //检测搜索词的每一个字符
             for (var i = 0; i < query.Length; i++)
             {
-                //Console.WriteLine("搜索字符"+query[i]);
+                Console.WriteLine("搜索字符"+query[i]);
                 var array = matchIndexList.ToArray();
                 if (array.Length == 0)
                 {
                     array = new int[]{0};
                 }
                 var allMatchNum =array.Length;
+                int nowMatchIndex = 0;
                 matchIndexList.Clear();
                 var match = false;
                 foreach (var i1 in array)
                 {
                     for (int j = i1; j < enumerable.Count(); j++)
                     {
-                        //Console.WriteLine(" 搜索拼音"+string.Join(",",pinyins.ElementAt(j)));
+                        Console.WriteLine(" 搜索拼音"+string.Join(",",pinyins.ElementAt(j)));
                         var elementAt = enumerable.ElementAt(j);
                         foreach (var se in elementAt)
                         {
-                            //Console.WriteLine("     拼音字符"+se);
+                            Console.WriteLine("     拼音字符"+se);
                             if (se.StartsWith(query[i]))
                             {
-                                //Console.WriteLine("     匹配成功");
+                                Console.WriteLine("     匹配成功");
                                 StringBuilder sb = new();
                                 sb.Append(query[i]);
                                 while (i < query.Length - 1)
@@ -187,16 +192,16 @@ public class PinyinSearcher<T>
                                     sb.Append(query[i+1]);
                                     if (!se.StartsWith(sb.ToString()))
                                     {
-                                        //Console.WriteLine("     "+sb+" "+se+"匹配失败");
+                                        Console.WriteLine("     "+sb+" "+se+"匹配失败");
                                         break;
                                     }
                                     else
                                     {
-                                        //Console.WriteLine("     "+sb+" "+se+"匹配成功");
+                                        Console.WriteLine("     "+sb+" "+se+"匹配成功");
                                         i++;
                                     }
                                 }
-                                //Console.WriteLine("     L "+sb+" "+se+"匹配成功");
+                                Console.WriteLine("     L "+sb+" "+se+"匹配成功");
                                 match = true;
                                 matches[j] = true;
                                 weight++;
@@ -225,16 +230,65 @@ public class PinyinSearcher<T>
             }
             if (matchT)
             {
+                List<List<int>> matchGroups = new List<List<int>>();
+                List<int> currentGroup = new List<int>();
+
+                for (var i = 0; i < matches.Length; i++)
+                {
+                    if (matches[i])
+                    {
+                        currentGroup.Add(i);
+                    }
+                    else
+                    {
+                        if (currentGroup.Count > 0)
+                        {
+                            matchGroups.Add(currentGroup);
+                            currentGroup = new List<int>();
+                        }
+                    }
+                }
+
+                if (currentGroup.Count > 0)
+                {
+                    matchGroups.Add(currentGroup);
+                }
+
+                foreach (var group in matchGroups)
+                {
+                    int firstMatchIndex = group.First();
+                    int lastMatchIndex = group.Last();
+
+                    Console.WriteLine("firstMatchIndex " + firstMatchIndex);
+                    Console.WriteLine("lastMatchIndex " + lastMatchIndex);
+
+                    for (var i = firstMatchIndex; i <= lastMatchIndex; i++)
+                    {
+                        if (!matches[i])
+                        {
+                            return;
+                        }
+                    }
+                }
                 results.Add(new SearchResults<T>
                 {
                     Source = source,
                     Weight = weight/ enumerable.Count(),
                     CharMatchResults = matches
                 });
+                if (CharMatchResultsPropertyName!=null)
+                {
+                    var propertyInfo = source.GetType().GetProperty(CharMatchResultsPropertyName);
+                    if ( propertyInfo!= null)
+                    {
+                        propertyInfo.SetValue(source,matches);
+                    }
+                }
             }
 
                 
         }
+        
         
     }
     public IEnumerable<SearchResults<T>> Search(string query)

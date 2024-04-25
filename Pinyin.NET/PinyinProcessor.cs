@@ -70,9 +70,10 @@ public class PinyinProcessor
         ' ', '_', '-', '.', ',', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '[', ']', '{', '}', 
         '\\', '|', ';', ':', '"', '\'', '<', '>', '?', '/', '~'
     ];
-    public IEnumerable<IEnumerable<string>> GetPinyin(string text)
+    public (IEnumerable<string>,IEnumerable<IEnumerable<string>>) GetPinyin(string text)
     {
         var result = new List<List<string>>();
+        var split = new List<string>();
         StringBuilder sb = new();
         for (var i = 0; i < text.Length; i++)
         {
@@ -83,20 +84,24 @@ public class PinyinProcessor
                 {
                     
                     result.Add([sb.ToString().ToLower()]);
+                    split.Add(sb.ToString());
                     sb.Clear();
                 }
                 var c = input;
                 if (_pinyinDict.ContainsKey(c))
                 {
                     result.Add([.._pinyinDict[c]]);
+                    split.Add(c);
                 }
                 else if (_pinyinFullDict.ContainsKey(c))
                 {
                     result.Add([.._pinyinFullDict[c]]);
+                    split.Add(c);
                 }
                 else
                 {
                     result.Add([c]);
+                    split.Add(c);
                 }
             }
             else
@@ -106,6 +111,7 @@ public class PinyinProcessor
                     if (sb.Length > 0)
                     {
                         result.Add([sb.ToString().ToLower()]);
+                        split.Add(sb.ToString());
                         sb.Clear();
                     }
                 }else if (_charArraySplit.Contains(text[i]))
@@ -113,6 +119,7 @@ public class PinyinProcessor
                     if (sb.Length > 0)
                     {
                         result.Add([sb.ToString().ToLower()]);
+                        split.Add(sb.ToString());
                         sb.Clear();
                     }
                     continue;
@@ -123,8 +130,9 @@ public class PinyinProcessor
         if (sb.Length > 0)
         {
             result.Add([sb.ToString().ToLower()]);
+            split.Add(sb.ToString());
         }
-        return result;
+        return (split,result);
     }
     private static string RemoveDiacritics(string text)
     {

@@ -16,7 +16,7 @@ class Program
     {
         var list = new List<MyClass>();
         PinyinProcessor pinyinProcessor = new PinyinProcessor();
-        var enumerable = pinyinProcessor.GetPinyin("Stea mSt2等2待");
+        var enumerable = pinyinProcessor.GetPinyin("JetBrainsToolbox");
         // list.Add(new MyClass
         // {
         //     Name = "1.1.2.5内测版5.0",
@@ -30,9 +30,9 @@ class Program
         list.Add(new MyClass
         {
             Name = "但是等待",
-            Pinyin = pinyinProcessor.GetPinyin("但是等待")});
+            Pinyin = pinyinProcessor.GetPinyin("JetBrainsToolbox").Item2});
         PinyinSearcher<MyClass> pinyinSearcher = new PinyinSearcher<MyClass>(list, "Pinyin");
-        var search = pinyinSearcher.Search("dansden");
+        var search = pinyinSearcher.Search("jet");
         foreach (var searchResult in search)
         {
             Console.WriteLine($" {searchResult.Weight}  {searchResult.Source.Name}");
