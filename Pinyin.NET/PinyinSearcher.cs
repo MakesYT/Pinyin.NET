@@ -142,154 +142,144 @@ public class PinyinSearcher<T>
     }
 
 
-    private void PreSearch()
+    private void PreSearch(char query,IEnumerable<string> pinyins,List<int> searchPaths)
     {
         
+    }
+    public struct SearchPathItem
+    {
+        public int QueryStartIndex;
+        public int QueryEndIndex;
+        public int MatchedPinyinIndex;
+        public int MatchedPinyinPronounceIndex;
+        public override string ToString()
+        {
+            return
+                $"QueryStartIndex:{QueryStartIndex} QueryEndIndex:{QueryEndIndex} MatchedPinyinIndex:{MatchedPinyinIndex} MatchedPinyinPronounceIndex:{MatchedPinyinPronounceIndex}";
+        }
     }
     private void Search(string query,List<SearchResults<T>> results,T source)
     {
         var value = source.GetType()
                           .GetProperty(PropertyName)
                           .GetValue(source);
-        if (value
-            is IEnumerable<IEnumerable<string>> pinyins )
+        var overSearchPaths = new List<List<SearchPathItem>>();
+        if (value is not IEnumerable<IEnumerable<string>> keys)
         {
-            var enumerable = pinyins as IEnumerable<string>[] ?? pinyins.ToArray();
-            var matches =new bool[enumerable.Count()];
-            query = query.ToLower();
-            var weight = 0;
-            var matchIndexList = new List<int>();
-            var matchT = true;
-            //检测搜索词的每一个字符
-            for (var i = 0; i < query.Length; i++)
+            return;
+        }
+        for (var index = 0; index < query.ToArray().Length; index++)
+        {
+            var c = query.ToArray()[index];
+            var searchPaths = new List<SearchPathItem>();
             {
-                Console.WriteLine("搜索字符"+query[i]);
-                var array = matchIndexList.ToArray();
-                if (array.Length == 0)
+                var enumerable = keys.ToArray();
+                for (var i = 0; i < enumerable.Length; i++)
                 {
-                    array = new int[]{0};
-                }
-                var allMatchNum =array.Length;
-                int nowMatchIndex = 0;
-                matchIndexList.Clear();
-                var match = false;
-                foreach (var i1 in array)
-                {
-                    for (int j = i1; j < enumerable.Count(); j++)
+                    var enumerable1 = enumerable[i];
+                    for (int j = 0; j < enumerable1.Count(); j++)
                     {
-                        Console.WriteLine(" 搜索拼音"+string.Join(",",pinyins.ElementAt(j)));
-                        var elementAt = enumerable.ElementAt(j);
-                        foreach (var se in elementAt)
+                        if (enumerable1.ElementAt(j)
+                                       .StartsWith(c))
                         {
-                            Console.WriteLine("     拼音字符"+se);
-                            if (se.StartsWith(query[i]))
+                            StringBuilder sb = new();
+                            
+                            int i1 = index;
+                            
+                            while (i1 < query.Length )
                             {
-                                Console.WriteLine("     匹配成功");
-                                StringBuilder sb = new();
-                                sb.Append(query[i]);
-                                while (i < query.Length - 1)
+                                sb.Append(query[i1]);
+                                
+                                if (enumerable1.ElementAt(j).StartsWith(sb.ToString()))
                                 {
-                                    sb.Append(query[i+1]);
-                                    if (!se.StartsWith(sb.ToString()))
-                                    {
-                                        Console.WriteLine("     "+sb+" "+se+"匹配失败");
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("     "+sb+" "+se+"匹配成功");
-                                        i++;
-                                    }
+                                    i1++;
+                                    continue;
                                 }
-                                Console.WriteLine("     L "+sb+" "+se+"匹配成功");
-                                match = true;
-                                matches[j] = true;
-                                weight++;
-                                if (!matchIndexList.Contains(j)&&j>i1)
+                                else
                                 {
-                                    matchIndexList.Add(j);
+                                    i1--;
+                                    break;
                                 }
-                                    
                                 
                             }
-                        }
-                    }
-                    if (!match)
-                    {
-                        --allMatchNum;
-                        break;
-                    }
-                }
-                if (allMatchNum == 0)
-                {
-                    matchT = false;
-                    break;
-                }
-                    
-                   
-            }
-            if (matchT)
-            {
-                List<List<int>> matchGroups = new List<List<int>>();
-                List<int> currentGroup = new List<int>();
 
-                for (var i = 0; i < matches.Length; i++)
-                {
-                    if (matches[i])
-                    {
-                        currentGroup.Add(i);
-                    }
-                    else
-                    {
-                        if (currentGroup.Count > 0)
-                        {
-                            matchGroups.Add(currentGroup);
-                            currentGroup = new List<int>();
+                            if (i1>=query.Length)
+                            {
+                                i1--;
+                            }
+                            
+                            var searchPathItem = new SearchPathItem
+                            {
+                                QueryStartIndex = index,
+                                QueryEndIndex = i1,
+                                MatchedPinyinIndex = i,
+                                MatchedPinyinPronounceIndex = j
+                            };
+                            //Console.WriteLine(searchPathItem);
+                            searchPaths.Add(searchPathItem);
                         }
                     }
                 }
-
-                if (currentGroup.Count > 0)
-                {
-                    matchGroups.Add(currentGroup);
-                }
-
-                foreach (var group in matchGroups)
-                {
-                    int firstMatchIndex = group.First();
-                    int lastMatchIndex = group.Last();
-
-                    Console.WriteLine("firstMatchIndex " + firstMatchIndex);
-                    Console.WriteLine("lastMatchIndex " + lastMatchIndex);
-
-                    for (var i = firstMatchIndex; i <= lastMatchIndex; i++)
-                    {
-                        if (!matches[i])
-                        {
-                            return;
-                        }
-                    }
-                }
-                results.Add(new SearchResults<T>
-                {
-                    Source = source,
-                    Weight = weight/ enumerable.Count(),
-                    CharMatchResults = matches
-                });
-                if (CharMatchResultsPropertyName!=null)
-                {
-                    var propertyInfo = source.GetType().GetProperty(CharMatchResultsPropertyName);
-                    if ( propertyInfo!= null)
-                    {
-                        propertyInfo.SetValue(source,matches);
-                    }
-                }
-            }
 
                 
+            }
+            overSearchPaths.Add(searchPaths);
         }
-        
-        
+        var match = true;
+        var matched= new bool[query.Length];
+        var pinyinMatched = new bool[keys.Count()];
+        var weight = 0;
+        foreach (var overSearchPath in overSearchPaths)
+        {
+            foreach (var searchPathItem in overSearchPath)
+            {
+                pinyinMatched[searchPathItem.MatchedPinyinIndex] = true;
+                for (int i = searchPathItem.QueryStartIndex; i <=searchPathItem.QueryEndIndex; i++)
+                {
+                    matched[i] = true;
+                    weight++;
+                }
+            }
+        }
+        bool nowMatch = false;
+        int space = 0;
+        for (var i = 0; i < pinyinMatched.Length; i++)
+        {
+            if (nowMatch)
+            {
+                if (!pinyinMatched[i])
+                {
+                    nowMatch = false;
+                    space++;
+                }
+            }
+            else
+            {
+                nowMatch = pinyinMatched[i];
+            }
+        }
+
+        if (space !=0)
+        {
+            weight/=space;
+        }
+        if (matched.All(e=>e))
+        {
+            results.Add(new SearchResults<T>
+            {
+                Source = source,
+                Weight = ((double)weight)/ (keys.Count()),
+                CharMatchResults = pinyinMatched
+            });
+            if (CharMatchResultsPropertyName!=null)
+            {
+                var propertyInfo = source.GetType().GetProperty(CharMatchResultsPropertyName);
+                if ( propertyInfo!= null)
+                {
+                    propertyInfo.SetValue(source,pinyinMatched);
+                }
+            }
+        }
     }
     public IEnumerable<SearchResults<T>> Search(string query)
     {

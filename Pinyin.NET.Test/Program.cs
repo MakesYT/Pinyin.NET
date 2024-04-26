@@ -29,10 +29,14 @@ class Program
         //
         list.Add(new MyClass
         {
-            Name = "但是等待",
-            Pinyin = pinyinProcessor.GetPinyin("JetBrainsToolbox").Item2});
+            Name = "慕讯加速器",
+            Pinyin = pinyinProcessor.GetPinyin("慕讯加速器").Item2});
+        list.Add(new MyClass
+        {
+            Name = "ic_fluent_text_sort_mescending_24_regular",
+            Pinyin = pinyinProcessor.GetPinyin("ic_fluent_text_sort_mescending_24_regular").Item2});
         PinyinSearcher<MyClass> pinyinSearcher = new PinyinSearcher<MyClass>(list, "Pinyin");
-        var search = pinyinSearcher.Search("jet");
+        var search = pinyinSearcher.Search("mx");
         foreach (var searchResult in search)
         {
             Console.WriteLine($" {searchResult.Weight}  {searchResult.Source.Name}");
