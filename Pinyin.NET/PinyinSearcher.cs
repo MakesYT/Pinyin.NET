@@ -1,19 +1,21 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Text;
 
 namespace Pinyin.NET;
 
 public class PinyinSearcher
 {
-    
-    public IEnumerable Source { get; set; }
-    public string PropertyName { get; set; }
     public PinyinSearcher(IEnumerable source, string propertyName)
     {
         Source = source;
         PropertyName = propertyName;
         
     }
+
+    public IEnumerable Source { get; set; }
+    public string PropertyName { get; set; }
+
     public IEnumerable<SearchResults> Search(string query)
     {
         var results = new List<SearchResults>();
@@ -114,17 +116,12 @@ public class PinyinSearcher
        
         return results;
     }
-   
-  
 }
 
 public class PinyinSearcher<T> 
 {
-    public Dictionary<object,T> SourceDictionary { get; set; }
-    public IEnumerable Source { get; set; }
     private bool isKeyValuePair;
-    public string PropertyName { get; set; }
-    private string? CharMatchResultsPropertyName { get; set; }
+
     public PinyinSearcher(IEnumerable source, string propertyName,string? charMatchResultsPropertyName=null,bool isKeyValuePair=false)
     {
         Source = source;
@@ -133,7 +130,7 @@ public class PinyinSearcher<T>
         CharMatchResultsPropertyName = charMatchResultsPropertyName;
 
     }
-   
+
     public PinyinSearcher(Dictionary<object,T> source, string propertyName,string? charMatchResultsPropertyName=null)
     {
         SourceDictionary = source;
@@ -141,23 +138,17 @@ public class PinyinSearcher<T>
         CharMatchResultsPropertyName = charMatchResultsPropertyName;
     }
 
+    public Dictionary<object,T> SourceDictionary { get; set; }
+    public IEnumerable Source { get; set; }
+    public string PropertyName { get; set; }
+    private string? CharMatchResultsPropertyName { get; set; }
+
 
     private void PreSearch(char query,IEnumerable<string> pinyins,List<int> searchPaths)
     {
         
     }
-    public struct SearchPathItem
-    {
-        public int QueryStartIndex;
-        public int QueryEndIndex;
-        public int MatchedPinyinIndex;
-        public int MatchedPinyinPronounceIndex;
-        public override string ToString()
-        {
-            return
-                $"QueryStartIndex:{QueryStartIndex} QueryEndIndex:{QueryEndIndex} MatchedPinyinIndex:{MatchedPinyinIndex} MatchedPinyinPronounceIndex:{MatchedPinyinPronounceIndex}";
-        }
-    }
+
     private void Search(string query,List<SearchResults<T>> results,T source)
     {
         var value = source.GetType()
@@ -224,6 +215,32 @@ public class PinyinSearcher<T>
                 
             }
             overSearchPaths.Add(searchPaths);
+            var ismatched= new bool[query.Length];
+            for (var index1 = 0; index1 < index+1; index1++)
+            {
+                var overSearchPath = overSearchPaths[index1];
+                foreach (var searchPathItem in overSearchPath)
+                {
+                    for (int i = searchPathItem.QueryStartIndex; i <= searchPathItem.QueryEndIndex; i++)
+                    {
+                        ismatched[i] = true;
+                    }
+                }
+            }
+            var match1 = true;
+            for (var i = 0; i < index+1; i++)
+            {
+                if (!ismatched[i])
+                {
+                    match1 = false;
+                    break;
+                }
+
+            }
+            if (!match1)
+            {
+                return;
+            }
         }
         var match = true;
         var matched= new bool[query.Length];
@@ -241,7 +258,7 @@ public class PinyinSearcher<T>
                 }
             }
         }
-        bool nowMatch = false;
+        bool nowMatch = true;
         int space = 0;
         for (var i = 0; i < pinyinMatched.Length; i++)
         {
@@ -281,30 +298,48 @@ public class PinyinSearcher<T>
             }
         }
     }
+
     public IEnumerable<SearchResults<T>> Search(string query)
     {
         var results = new List<SearchResults<T>>();
         if (Source is not null)
         {
-            foreach (var o in Source)
+            if (isKeyValuePair)
             {
-                if (isKeyValuePair)
+                Parallel.ForEach((ConcurrentDictionary<string,T>)Source, o =>
                 {
                     Search(query, results, (T)o.GetType().GetProperty("Value").GetValue(o));
-                }else
+                });
+            }else
+            {
+                Parallel.ForEach((IEnumerable<T>)Source, o =>
                 {
                     Search(query, results, (T)o);
-                }
+                });
             }
+            
         }else if (SourceDictionary is not null)
         {
-            foreach (var (key, value) in SourceDictionary)
+            Parallel.ForEach(SourceDictionary, o =>
             {
-                Search(query, results,value);
-            }
+                Search(query, results, o.Value);
+            });
         }
         
        
         return results;
+    }
+
+    public struct SearchPathItem
+    {
+        public int QueryStartIndex;
+        public int QueryEndIndex;
+        public int MatchedPinyinIndex;
+        public int MatchedPinyinPronounceIndex;
+        public override string ToString()
+        {
+            return
+                $"QueryStartIndex:{QueryStartIndex} QueryEndIndex:{QueryEndIndex} MatchedPinyinIndex:{MatchedPinyinIndex} MatchedPinyinPronounceIndex:{MatchedPinyinPronounceIndex}";
+        }
     }
 }
