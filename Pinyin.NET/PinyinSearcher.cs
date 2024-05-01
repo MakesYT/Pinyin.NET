@@ -122,26 +122,24 @@ public class PinyinSearcher<T>
 {
     private bool isKeyValuePair;
 
-    public PinyinSearcher(IEnumerable source, string propertyName,string? charMatchResultsPropertyName=null,bool isKeyValuePair=false)
+    public PinyinSearcher(IEnumerable source, string propertyName,bool isKeyValuePair=false)
     {
         Source = source;
         PropertyName = propertyName;
         this.isKeyValuePair = isKeyValuePair;
-        CharMatchResultsPropertyName = charMatchResultsPropertyName;
 
     }
 
-    public PinyinSearcher(Dictionary<object,T> source, string propertyName,string? charMatchResultsPropertyName=null)
+    public PinyinSearcher(Dictionary<object,T> source, string propertyName)
     {
         SourceDictionary = source;
         PropertyName = propertyName;
-        CharMatchResultsPropertyName = charMatchResultsPropertyName;
+        
     }
 
     public Dictionary<object,T> SourceDictionary { get; set; }
     public IEnumerable Source { get; set; }
     public string PropertyName { get; set; }
-    private string? CharMatchResultsPropertyName { get; set; }
 
 
     private void PreSearch(char query,IEnumerable<string> pinyins,List<int> searchPaths)
@@ -149,22 +147,23 @@ public class PinyinSearcher<T>
         
     }
 
-    private void Search(string query,List<SearchResults<T>> results,T source)
+    private void Search(string query,ConcurrentBag<SearchResults<T>> results,T source)
     {
         var value = source.GetType()
                           .GetProperty(PropertyName)
                           .GetValue(source);
         var overSearchPaths = new List<List<SearchPathItem>>();
-        if (value is not IEnumerable<IEnumerable<string>> keys)
+        if (value is not PinyinItem pinyinItem)
         {
             return;
         }
+        
         for (var index = 0; index < query.ToArray().Length; index++)
         {
             var c = query.ToArray()[index];
             var searchPaths = new List<SearchPathItem>();
             {
-                var enumerable = keys.ToArray();
+                var enumerable = pinyinItem.Keys.ToArray();
                 for (var i = 0; i < enumerable.Length; i++)
                 {
                     var enumerable1 = enumerable[i];
@@ -244,7 +243,7 @@ public class PinyinSearcher<T>
         }
         var match = true;
         var matched= new bool[query.Length];
-        var pinyinMatched = new bool[keys.Count()];
+        var pinyinMatched = new bool[pinyinItem.Keys.Count()];
         var weight = 0;
         foreach (var overSearchPath in overSearchPaths)
         {
@@ -282,26 +281,26 @@ public class PinyinSearcher<T>
         }
         if (matched.All(e=>e))
         {
+            
             results.Add(new SearchResults<T>
             {
                 Source = source,
-                Weight = ((double)weight)/ (keys.Count()),
+                Weight = ((double)weight)/ (pinyinItem.Keys.Count()),
                 CharMatchResults = pinyinMatched
             });
-            if (CharMatchResultsPropertyName!=null)
+            
+            var propertyInfo = source.GetType().GetProperty(PropertyName);
+            if ( propertyInfo!= null)
             {
-                var propertyInfo = source.GetType().GetProperty(CharMatchResultsPropertyName);
-                if ( propertyInfo!= null)
-                {
-                    propertyInfo.SetValue(source,pinyinMatched);
-                }
+                propertyInfo.GetValue(source).GetType().GetProperty("CharMatchResults").SetValue(propertyInfo.GetValue(source),pinyinMatched);
             }
+            
         }
     }
 
     public IEnumerable<SearchResults<T>> Search(string query)
     {
-        var results = new List<SearchResults<T>>();
+        var results = new ConcurrentBag<SearchResults<T>>();
         if (Source is not null)
         {
             if (isKeyValuePair)

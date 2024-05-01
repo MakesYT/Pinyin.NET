@@ -8,8 +8,25 @@ namespace Pinyin.NET;
 
 public class PinyinProcessor
 {
+    //大写字母数组char
+    readonly char[] _charArray =
+    [
+
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+        'V', 'W', 'X', 'Y', 'Z'
+    ];
+
+    readonly char[] _charArraySplit =
+    [
+        ' ', '_', '-', '.', ',', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '[', ']', '{', '}', 
+        '\\', '|', ';', ':', '"', '\'', '<', '>', '?', '/', '~'
+    ];
+
+    //中文匹配正则
+    readonly Regex regex = new("[\u4e00-\u9fa5]");
     private Dictionary<string, string[]> _pinyinDict=new();
     private Dictionary<string, string[]> _pinyinFullDict=new();
+
     public PinyinProcessor(PinyinFormat format = PinyinFormat.WithoutTone)
     {
         var assembly = Assembly.GetExecutingAssembly();
@@ -56,30 +73,30 @@ public class PinyinProcessor
             
         }
     }
-    //中文匹配正则
-    readonly Regex regex = new("[\u4e00-\u9fa5]");
-    //大写字母数组char
-    readonly char[] _charArray =
-    [
 
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-        'V', 'W', 'X', 'Y', 'Z'
-    ];
-    readonly char[] _charArraySplit =
-    [
-        ' ', '_', '-', '.', ',', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '+', '=', '[', ']', '{', '}', 
-        '\\', '|', ';', ':', '"', '\'', '<', '>', '?', '/', '~'
-    ];
-    public (IEnumerable<string>,IEnumerable<IEnumerable<string>>) GetPinyin(string text)
+    public PinyinItem GetPinyin(string text,bool withZhongWen=false)
     {
         var result = new List<List<string>>();
         var split = new List<string>();
         StringBuilder sb = new();
+        int zhongWenCount = 0;
+        if (withZhongWen)
+        {
+            foreach (var c in text)
+            {
+                if (regex.IsMatch(c.ToString()))
+                {
+                    result.Add([c.ToString()]);
+                }
+            }
+        }
+        
         for (var i = 0; i < text.Length; i++)
         {
             var input = text[i].ToString();
             if (regex.IsMatch(input))
             {
+                zhongWenCount++;
                 if (sb.Length > 0)
                 {
                     
@@ -132,8 +149,15 @@ public class PinyinProcessor
             result.Add([sb.ToString().ToLower()]);
             split.Add(sb.ToString());
         }
-        return (split,result);
+
+        return new PinyinItem()
+        {
+            SplitWords = split.ToArray(),
+            Keys = result,
+            ZhongWenCount = zhongWenCount
+        };
     }
+
     private static string RemoveDiacritics(string text)
     {
         var normalizedString = text.Normalize(NormalizationForm.FormD);
@@ -148,5 +172,4 @@ public class PinyinProcessor
         }
         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
-    
 }
