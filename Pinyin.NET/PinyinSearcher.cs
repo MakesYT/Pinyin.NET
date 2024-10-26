@@ -160,15 +160,14 @@ public class PinyinSearcher<T>
         }
 
         IEnumerable<SearchPathItem> NextQueryCharMatch(int nowQueryIndex, int nowMatchedPinyinIndex,
-            bool notFirstChar = false, int queryStartIndex = 0, int matchedPinyinStartIndex = 0,
-            int matchedPinyinNowStartIndex = 0)
+            bool notFirstChar = false, int queryStartIndex = 0, int matchedPinyinStartIndex = 0, int matchedQueryStartIndex=0,int queryStartPinyinIndex=0)
         {
             if (nowQueryIndex==query.Length)
             {
                 yield return new SearchPathItem()
                 {
-                    MatchedPinyinStartIndex = matchedPinyinStartIndex,
-                    MatchedPinyinEndIndex = nowMatchedPinyinIndex-1,
+                    MatchedPinyinStartIndex = queryStartPinyinIndex,
+                    MatchedPinyinEndIndex = nowMatchedPinyinIndex,
                     QueryStartIndex = queryStartIndex,
                     QueryEndIndex = nowQueryIndex-1
                     
@@ -179,23 +178,19 @@ public class PinyinSearcher<T>
             var c = query[nowQueryIndex];
             if (!notFirstChar)
             {
-                for (var i = nowMatchedPinyinIndex+1; i < pinyinItem.Keys.Count; i++)
+                for (var i = nowMatchedPinyinIndex; i < pinyinItem.Keys.Count; i++)
                 {
                     var pinyinItemKey = pinyinItem.Keys[i];
                     if (pinyinItemKey.Any(e => e.StartsWith(c)))
                     {
                         if (nowQueryIndex==0)
                         {
-                            var a = i;
-                            foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, i, true,queryStartIndex,a,matchedPinyinNowStartIndex))
-                            {
-                                yield return searchPathItem;
-                            }
-                        }else 
-                            foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, i, true,queryStartIndex,matchedPinyinStartIndex,matchedPinyinNowStartIndex))
-                            {
-                                yield return searchPathItem;
-                            }
+                            queryStartPinyinIndex = i;
+                        }
+                        foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, i, true,queryStartIndex,i,nowQueryIndex,queryStartPinyinIndex))
+                        {
+                            yield return searchPathItem;
+                        }
                       
                     }
                 }
@@ -204,17 +199,17 @@ public class PinyinSearcher<T>
             {
                 //全拼
                 var pinyinItemKey = pinyinItem.Keys[nowMatchedPinyinIndex];
-                var substring = query.Substring(matchedPinyinNowStartIndex,nowQueryIndex-matchedPinyinNowStartIndex+1);
+                var substring = query.Substring(matchedQueryStartIndex,nowQueryIndex-matchedQueryStartIndex+1);
                 if (pinyinItemKey.Any(e=>e.StartsWith(substring)))
                 {
-                    foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, nowMatchedPinyinIndex, true,queryStartIndex,matchedPinyinStartIndex))
+                    foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, nowMatchedPinyinIndex, true,queryStartIndex,matchedPinyinStartIndex,matchedQueryStartIndex,queryStartPinyinIndex))
                     {
                         yield return  searchPathItem;
                     }
                    
                 }else
                 {
-                    foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex, nowMatchedPinyinIndex, false,queryStartIndex,matchedPinyinStartIndex,nowQueryIndex))
+                    foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex, nowMatchedPinyinIndex+1, false,queryStartIndex,matchedPinyinStartIndex,matchedQueryStartIndex,queryStartPinyinIndex))
                     {
                         yield  return searchPathItem;
                     }
@@ -222,7 +217,7 @@ public class PinyinSearcher<T>
                 }
             }
         }
-        var nextQueryCharMatch = NextQueryCharMatch(0,-1);
+        var nextQueryCharMatch = NextQueryCharMatch(0,0);
         foreach (var searchPathItem in nextQueryCharMatch)
         {
             if (searchPathItem.QueryEndIndex==-1)
@@ -250,7 +245,7 @@ public class PinyinSearcher<T>
         }
         var pinyinMatched = new bool[pinyinItem.Keys.Count()];
         
-        if (IsMatchOrNot(0))
+        if (overSearchPaths.Any())
         {
             foreach (var overSearchPath in overSearchPaths)
             {
