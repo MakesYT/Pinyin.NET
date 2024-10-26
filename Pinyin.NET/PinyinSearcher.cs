@@ -223,7 +223,6 @@ public class PinyinSearcher<T>
             }
         }
         var nextQueryCharMatch = NextQueryCharMatch(0,-1);
-        var count = nextQueryCharMatch.Count();
         foreach (var searchPathItem in nextQueryCharMatch)
         {
             if (searchPathItem.QueryEndIndex==-1)
@@ -255,7 +254,7 @@ public class PinyinSearcher<T>
         {
             foreach (var overSearchPath in overSearchPaths)
             {
-                for (int i = overSearchPath.MatchedPinyinStartIndex; i < overSearchPath.MatchedPinyinEndIndex; i++)
+                for (int i = overSearchPath.MatchedPinyinStartIndex; i <= overSearchPath.MatchedPinyinEndIndex; i++)
                 {
                     pinyinMatched[i] = true;
                 }
