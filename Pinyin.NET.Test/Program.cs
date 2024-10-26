@@ -16,7 +16,7 @@ class Program
     {
         var list = new List<MyClass>();
         PinyinProcessor pinyinProcessor = new PinyinProcessor();
-        var enumerable = pinyinProcessor.GetPinyin("JetBrainsToolbox");
+        var enumerable = pinyinProcessor.GetPinyin("JetBrainsToolbox",true);
         // list.Add(new MyClass
         // {
         //     Name = "1.1.2.5内测版5.0",
@@ -34,7 +34,7 @@ class Program
         list.Add(new MyClass
         {
             Name = "高级安全WindowsDefender防火墙",
-            Pinyin = pinyinProcessor.GetPinyin("高级安全WindowsDefender防火墙")});
+            Pinyin = pinyinProcessor.GetPinyin("高级安全WindowsDefender防火墙",true)});
         // list.Add(new MyClass
         // {
         //     Name = "ic_fluent_text_sort_mescending_24_regular",

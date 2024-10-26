@@ -82,11 +82,37 @@ public class PinyinProcessor
         int zhongWenCount = 0;
         if (withZhongWen)
         {
-            foreach (var c in text)
+            for (var i = 0; i < text.Length; i++)
             {
-                if (regex.IsMatch(c.ToString()))
+                var input = text[i].ToString();
+                if (regex.IsMatch(input))
                 {
-                    result.Add([c.ToString()]);
+                    if (sb.Length > 0)
+                    {
+                        result.Add([sb.ToString().ToLower()]);
+                        sb.Clear();
+                    }
+                    result.Add([input]);
+                }
+                else
+                {
+                    if (_charArray.Contains(text[i]))
+                    {
+                        if (sb.Length > 0)
+                        {
+                            result.Add([sb.ToString().ToLower()]);
+                            sb.Clear();
+                        }
+                    }else if (_charArraySplit.Contains(text[i]))
+                    {
+                        if (sb.Length > 0)
+                        {
+                            result.Add([sb.ToString().ToLower()]);
+                            sb.Clear();
+                        }
+                        continue;
+                    }
+                    sb.Append(input);
                 }
             }
         }

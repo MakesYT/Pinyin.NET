@@ -165,7 +165,7 @@ public class PinyinSearcher<T>
         {
             if (nowQueryIndex==query.Length)
             {
-               yield return new SearchPathItem()
+                yield return new SearchPathItem()
                 {
                     MatchedPinyinStartIndex = matchedPinyinStartIndex,
                     MatchedPinyinEndIndex = nowMatchedPinyinIndex-1,
@@ -192,10 +192,10 @@ public class PinyinSearcher<T>
                                 yield return searchPathItem;
                             }
                         }else 
-                        foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, i, true,queryStartIndex,matchedPinyinStartIndex,matchedPinyinNowStartIndex))
-                        {
-                            yield return searchPathItem;
-                        }
+                            foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, i, true,queryStartIndex,matchedPinyinStartIndex,matchedPinyinNowStartIndex))
+                            {
+                                yield return searchPathItem;
+                            }
                       
                     }
                 }
