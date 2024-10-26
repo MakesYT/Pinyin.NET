@@ -184,6 +184,14 @@ public class PinyinSearcher<T>
                     var pinyinItemKey = pinyinItem.Keys[i];
                     if (pinyinItemKey.Any(e => e.StartsWith(c)))
                     {
+                        if (nowQueryIndex==0)
+                        {
+                            var a = i;
+                            foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, i, true,queryStartIndex,a,matchedPinyinNowStartIndex))
+                            {
+                                yield return searchPathItem;
+                            }
+                        }else 
                         foreach (var searchPathItem in NextQueryCharMatch(nowQueryIndex + 1, i, true,queryStartIndex,matchedPinyinStartIndex,matchedPinyinNowStartIndex))
                         {
                             yield return searchPathItem;
@@ -215,6 +223,7 @@ public class PinyinSearcher<T>
             }
         }
         var nextQueryCharMatch = NextQueryCharMatch(0,-1);
+        var count = nextQueryCharMatch.Count();
         foreach (var searchPathItem in nextQueryCharMatch)
         {
             if (searchPathItem.QueryEndIndex==-1)
@@ -224,7 +233,7 @@ public class PinyinSearcher<T>
             overSearchPaths.Add(searchPathItem);
         }
         
-        bool IsMatchOrNot(int queryEndIndex, int matchedPinyinEndIndex)
+        bool IsMatchOrNot(int queryEndIndex)
         {
             if (queryEndIndex==query.Length-1)
             {
@@ -233,23 +242,24 @@ public class PinyinSearcher<T>
             var searchPathItems = overSearchPaths.Where(e=>e.QueryStartIndex==queryEndIndex);
             return searchPathItems.Any(e =>
             {
-                if (e.MatchedPinyinStartIndex == matchedPinyinEndIndex)
+                if (e.QueryStartIndex == queryEndIndex)
                 {
-                    return IsMatchOrNot(e.QueryEndIndex, e.MatchedPinyinEndIndex);
+                    return IsMatchOrNot(e.QueryEndIndex);
                 }
                 else return false;
             });
         }
         var pinyinMatched = new bool[pinyinItem.Keys.Count()];
-        foreach (var overSearchPath in overSearchPaths)
+        
+        if (IsMatchOrNot(0))
         {
-            for (int i = overSearchPath.MatchedPinyinStartIndex; i < overSearchPath.MatchedPinyinEndIndex; i++)
+            foreach (var overSearchPath in overSearchPaths)
             {
-                pinyinMatched[i] = true;
+                for (int i = overSearchPath.MatchedPinyinStartIndex; i < overSearchPath.MatchedPinyinEndIndex; i++)
+                {
+                    pinyinMatched[i] = true;
+                }
             }
-        }
-        if (IsMatchOrNot(0,0))
-        {
             results.Add(new SearchResults<T>
             {
                 Source = source,
@@ -260,7 +270,7 @@ public class PinyinSearcher<T>
             var propertyInfo = source.GetType().GetProperty(PropertyName);
             if ( propertyInfo!= null)
             {
-                propertyInfo.GetValue(source).GetType().GetProperty("CharMatchResults").SetValue(propertyInfo.GetValue(source),pinyinMatched);
+                propertyInfo.GetValue(source)?.GetType()?.GetProperty("CharMatchResults")?.SetValue(propertyInfo.GetValue(source),pinyinMatched);
             }
         }
         

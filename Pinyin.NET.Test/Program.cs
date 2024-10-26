@@ -27,18 +27,18 @@ class Program
         //     Name = "尝试111到底是",
         //     Pinyin = enumerable});
         //
-        list.Add(new MyClass
-        {
-            Name = "慕讯加速器",
-            Pinyin = pinyinProcessor.GetPinyin("慕讯加速器")});
+        // list.Add(new MyClass
+        // {
+        //     Name = "慕讯加速器",
+        //     Pinyin = pinyinProcessor.GetPinyin("慕讯加速器")});
         list.Add(new MyClass
         {
             Name = "高级安全WindowsDefender防火墙",
             Pinyin = pinyinProcessor.GetPinyin("高级安全WindowsDefender防火墙")});
-        list.Add(new MyClass
-        {
-            Name = "ic_fluent_text_sort_mescending_24_regular",
-            Pinyin = pinyinProcessor.GetPinyin("ic_fluent_text_sort_mescending_24_regular")});
+        // list.Add(new MyClass
+        // {
+        //     Name = "ic_fluent_text_sort_mescending_24_regular",
+        //     Pinyin = pinyinProcessor.GetPinyin("ic_fluent_text_sort_mescending_24_regular")});
         PinyinSearcher<MyClass> pinyinSearcher = new PinyinSearcher<MyClass>(list, "Pinyin");
         var search = pinyinSearcher.Search("janq");
         foreach (var searchResult in search)
