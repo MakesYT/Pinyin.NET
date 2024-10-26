@@ -241,6 +241,13 @@ public class PinyinSearcher<T>
             });
         }
         var pinyinMatched = new bool[pinyinItem.Keys.Count()];
+        foreach (var overSearchPath in overSearchPaths)
+        {
+            for (int i = overSearchPath.MatchedPinyinStartIndex; i < overSearchPath.MatchedPinyinEndIndex; i++)
+            {
+                pinyinMatched[i] = true;
+            }
+        }
         if (IsMatchOrNot(0,0))
         {
             results.Add(new SearchResults<T>
