@@ -170,6 +170,6 @@ public class PinyinProcessor
                 stringBuilder.Append(c);
             }
         }
-        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        return stringBuilder.ToString();
     }
 }

@@ -7,7 +7,7 @@ namespace Pinyin.NET;
 struct MyClass
 {
    public string Name { get; set; }
-   public IEnumerable<IEnumerable<string>> Pinyin { get; set; }
+   public PinyinItem Pinyin { get; set; }
 }
 class Program
 {
@@ -30,13 +30,17 @@ class Program
         list.Add(new MyClass
         {
             Name = "慕讯加速器",
-            Pinyin = pinyinProcessor.GetPinyin("慕讯加速器").Item2});
+            Pinyin = pinyinProcessor.GetPinyin("慕讯加速器")});
+        list.Add(new MyClass
+        {
+            Name = "高级安全WindowsDefender防火墙",
+            Pinyin = pinyinProcessor.GetPinyin("高级安全WindowsDefender防火墙")});
         list.Add(new MyClass
         {
             Name = "ic_fluent_text_sort_mescending_24_regular",
-            Pinyin = pinyinProcessor.GetPinyin("ic_fluent_text_sort_mescending_24_regular").Item2});
+            Pinyin = pinyinProcessor.GetPinyin("ic_fluent_text_sort_mescending_24_regular")});
         PinyinSearcher<MyClass> pinyinSearcher = new PinyinSearcher<MyClass>(list, "Pinyin");
-        var search = pinyinSearcher.Search("mx");
+        var search = pinyinSearcher.Search("janq");
         foreach (var searchResult in search)
         {
             Console.WriteLine($" {searchResult.Weight}  {searchResult.Source.Name}");
