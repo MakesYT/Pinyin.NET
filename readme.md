@@ -13,30 +13,33 @@ Pinyin.NET 汉字转换为拼音 拼音模糊搜索
 例如"到底"返回值为[["dao"], ["di","de"]]
 例如"Stea mSt2等2待"返回值为[ ["stea"], ["m"], ["st2"], ["deng"],["2"], ["dai"]]
 ```csharp
-PinyinProcessor pinyinProcessor = new PinyinProcessor();//不带音调
+PinyinProcessor pinyinProcessor = new PinyinProcessor();
 //PinyinProcessor pinyinProcessor = new PinyinProcessor(PinyinFormat.WithToneMark); //带音调
 pinyinProcessor.GetPinyin("到底");//[["dao"], ["di","de"]]
+pinyinProcessor.GetPinyin("到底",true);//[["到"],["底"],["dao"], ["di","de"]]
 ```
 
 ## 2. 拼音模糊搜索
 在给的的数据源中的指定属性上进行拼音模糊搜索  
 支持拼音全拼 首字母 全拼和首字母混合搜索 (支持多音字)
 ```csharp
-list.Add(new MyClass
-{
-    Name = "但是等待",
-    Pinyin = pinyinProcessor.GetPinyin("但是等待")
-});
-PinyinSearcher<MyClass> pinyinSearcher = new PinyinSearcher<MyClass>(list, "Pinyin");
-var search = pinyinSearcher.Search("dansden");
+ list.Add(new MyClass
+        {
+            Name = "高级安全WindowsDefender防火墙",
+            Pinyin = pinyinProcessor.GetPinyin("高级安全WindowsDefender防火墙",true)});
+ PinyinSearcher<MyClass> pinyinSearcher = new PinyinSearcher<MyClass>(list, "Pinyin");
+ var search = pinyinSearcher.Search("anqwin");
 foreach (var searchResult in search)
 {
     Console.WriteLine($" {searchResult.Weight}  {searchResult.Source.Name}");
 }
-//输出 6  尝试111到底是
+//输出 1  高级安全WindowsDefender防火墙
 ```
 
 ## 更新日志
+### 1.1.0
+1. 重构 搜索算法
+2. 优化 汉字转拼音的
 ### 1.0.3
 1. 重构 搜索
 ### 1.0.2
