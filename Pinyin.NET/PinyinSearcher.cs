@@ -27,12 +27,7 @@ public class PinyinSearcher<T>
     public Dictionary<object,T> SourceDictionary { get; set; }
     public IEnumerable Source { get; set; }
     public string PropertyName { get; set; }
-
-
-    private void PreSearch(char query,IEnumerable<string> pinyins,List<int> searchPaths)
-    {
-        
-    }
+    
 
     private void Search(string query,ConcurrentBag<SearchResults<T>> results,T source)
     {
@@ -140,10 +135,25 @@ public class PinyinSearcher<T>
                     pinyinMatched[i] = true;
                 }
             }
+
+            int weight = 0;
+            foreach (var overSearchPath in overSearchPaths)
+            {
+                if (overSearchPath.QueryStartIndex == 0 && overSearchPath.QueryEndIndex == pinyinItem.Keys.Count -1)
+                {
+                    weight += 1000;
+                }
+
+                if (overSearchPath.QueryStartIndex == 0 )
+                {
+                    weight += 100;
+                }
+                weight++;
+            }
             results.Add(new SearchResults<T>
             {
                 Source = source,
-                Weight = overSearchPaths.Count,
+                Weight = weight/overSearchPaths.Count,
                 CharMatchResults = pinyinMatched
             });
             

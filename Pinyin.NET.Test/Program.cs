@@ -33,8 +33,16 @@ class Program
         //     Pinyin = pinyinProcessor.GetPinyin("慕讯加速器")});
         list.Add(new MyClass
         {
-            Name = "高级安全WindowsDefender防火墙",
-            Pinyin = pinyinProcessor.GetPinyin("高级安全WindowsDefender防火墙",true)});
+            Name = "网易发烧游戏",
+            Pinyin = pinyinProcessor.GetPinyin("网易发烧游戏",true)});
+        list.Add(new MyClass
+        {
+            Name = "微信",
+            Pinyin = pinyinProcessor.GetPinyin("微信",true)});
+        list.Add(new MyClass
+        {
+            Name = "Windows相机",
+            Pinyin = pinyinProcessor.GetPinyin("Windows相机",true)});
         // list.Add(new MyClass
         // {
         //     Name = "TeamSpeak3 Client",
@@ -44,7 +52,7 @@ class Program
         //     Name = "ic_fluent_text_sort_mescending_24_regular",
         //     Pinyin = pinyinProcessor.GetPinyin("ic_fluent_text_sort_mescending_24_regular")});
         PinyinSearcher<MyClass> pinyinSearcher = new PinyinSearcher<MyClass>(list, "Pinyin");
-        var search = pinyinSearcher.Search("anqwin");
+        var search = pinyinSearcher.Search("wx");
         foreach (var searchResult in search)
         {
             Console.WriteLine($" {searchResult.Weight}  {searchResult.Source.Name}");

@@ -79,8 +79,7 @@ public class PinyinProcessor
         var result = new List<List<string>>();
         var split = new List<string>();
         StringBuilder sb = new();
-        int zhongWenCount = 0;
-        if (withZhongWen)
+        
         {
             for (var i = 0; i < text.Length; i++)
             {
@@ -90,9 +89,40 @@ public class PinyinProcessor
                     if (sb.Length > 0)
                     {
                         result.Add([sb.ToString().ToLower()]);
+                        split.Add(sb.ToString());
                         sb.Clear();
                     }
-                    result.Add([input]);
+                    var c = input;
+                    if (_pinyinDict.ContainsKey(c))
+                    {
+                        if (withZhongWen)
+                        {
+                            result.Add([.._pinyinDict[c], input]);
+                        }
+                        else
+                        {
+                            result.Add([.._pinyinDict[c]]);
+                        }
+                        split.Add(c);
+                    }
+                    else if (_pinyinFullDict.ContainsKey(c))
+                    {
+                        if (withZhongWen)
+                        {
+                            result.Add([.._pinyinFullDict[c], input]);
+                        }
+                        else
+                        {
+                            result.Add([.._pinyinFullDict[c]]);
+                        }
+                        split.Add(c);
+                    }
+                    else
+                    {
+                        result.Add([c]);
+                        split.Add(c);
+                    }
+                    
                 }
                 else
                 {
@@ -101,6 +131,7 @@ public class PinyinProcessor
                         if (sb.Length > 0)
                         {
                             result.Add([sb.ToString().ToLower()]);
+                            split.Add(sb.ToString());
                             sb.Clear();
                         }
                     }else if (_charArraySplit.Contains(text[i]))
@@ -108,66 +139,13 @@ public class PinyinProcessor
                         if (sb.Length > 0)
                         {
                             result.Add([sb.ToString().ToLower()]);
+                            split.Add(sb.ToString());
                             sb.Clear();
                         }
                         continue;
                     }
                     sb.Append(input);
                 }
-            }
-        }
-        
-        for (var i = 0; i < text.Length; i++)
-        {
-            var input = text[i].ToString();
-            if (regex.IsMatch(input))
-            {
-                zhongWenCount++;
-                if (sb.Length > 0)
-                {
-                    
-                    result.Add([sb.ToString().ToLower()]);
-                    split.Add(sb.ToString());
-                    sb.Clear();
-                }
-                var c = input;
-                if (_pinyinDict.ContainsKey(c))
-                {
-                    result.Add([.._pinyinDict[c]]);
-                    split.Add(c);
-                }
-                else if (_pinyinFullDict.ContainsKey(c))
-                {
-                    result.Add([.._pinyinFullDict[c]]);
-                    split.Add(c);
-                }
-                else
-                {
-                    result.Add([c]);
-                    split.Add(c);
-                }
-            }
-            else
-            {
-                if (_charArray.Contains(text[i]))
-                {
-                    if (sb.Length > 0)
-                    {
-                        result.Add([sb.ToString().ToLower()]);
-                        split.Add(sb.ToString());
-                        sb.Clear();
-                    }
-                }else if (_charArraySplit.Contains(text[i]))
-                {
-                    if (sb.Length > 0)
-                    {
-                        result.Add([sb.ToString().ToLower()]);
-                        split.Add(sb.ToString());
-                        sb.Clear();
-                    }
-                    continue;
-                }
-                sb.Append(input);
             }
         }
         if (sb.Length > 0)
@@ -180,7 +158,6 @@ public class PinyinProcessor
         {
             SplitWords = split.ToArray(),
             Keys = result,
-            ZhongWenCount = zhongWenCount
         };
     }
 
