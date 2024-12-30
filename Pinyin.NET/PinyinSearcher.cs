@@ -136,7 +136,7 @@ public class PinyinSearcher<T>
                 }
             }
 
-            int weight = 0;
+            double weight = 0;
             foreach (var overSearchPath in overSearchPaths)
             {
                 if (overSearchPath.QueryStartIndex == 0 && overSearchPath.QueryEndIndex == pinyinItem.Keys.Count -1)
@@ -144,16 +144,18 @@ public class PinyinSearcher<T>
                     weight += 1000;
                 }
 
-                if (overSearchPath.QueryStartIndex == 0 )
+                if (overSearchPath.QueryStartIndex == 0 ) 
                 {
                     weight += 100;
                 }
                 weight++;
+                weight *=1.0* (overSearchPath.QueryEndIndex - overSearchPath.QueryStartIndex) /
+                          (overSearchPath.MatchedPinyinEndIndex - overSearchPath.MatchedPinyinStartIndex);
             }
             results.Add(new SearchResults<T>
             {
                 Source = source,
-                Weight = weight/overSearchPaths.Count,
+                Weight = weight/overSearchPaths.Count+1,
                 CharMatchResults = pinyinMatched
             });
             
